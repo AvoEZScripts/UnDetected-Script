@@ -1,0 +1,610 @@
+-- Check Place ID before loading anything else
+if game.PlaceId ~= 103037106396302 then
+    local coreGui = game:GetService("CoreGui")
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "WrongGameWarningGUI"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    pcall(function()
+        screenGui.Parent = coreGui
+    end)
+    if not screenGui.Parent then
+        local player = game:GetService("Players").LocalPlayer
+        local playerGui = player and player:WaitForChild("PlayerGui", 5)
+        if playerGui then
+            screenGui.Parent = playerGui
+        end
+    end
+
+    -- Entire screen dark background frame without gaps (with TweenService support)
+    local darkFrame = Instance.new("Frame")
+    darkFrame.Name = "DarkBackground"
+    darkFrame.Size = UDim2.new(1, 0, 1, 0)
+    darkFrame.Position = UDim2.new(0, 0, 0, 0)
+    darkFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    darkFrame.BackgroundTransparency = 0.05
+    darkFrame.BorderSizePixel = 0
+    darkFrame.Parent = screenGui
+
+    -- Center TextLabel
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "WarningText"
+    textLabel.Size = UDim2.new(0, 500, 0, 80)
+    textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    textLabel.Position = UDim2.new(0.5, 0, 0.45, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextColor3 = Color3.fromRGB(255, 75, 75)
+    textLabel.TextSize = 22
+    textLabel.Font = Enum.Font.GothamBold
+    textLabel.TextWrapped = true
+    textLabel.Text = "This Game is not Supported. Please join Real Game!"
+    textLabel.Parent = darkFrame
+
+    -- Close Button directly under the text label
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.Size = UDim2.new(0, 180, 0, 45)
+    closeButton.AnchorPoint = Vector2.new(0.5, 0)
+    closeButton.Position = UDim2.new(0.5, 0, 0.45, 60)
+    closeButton.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextSize = 16
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Text = "Understand"
+    closeButton.Parent = darkFrame
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 8)
+    uiCorner.Parent = closeButton
+
+    -- Sound effect instance for click feedback (Sound ID: 70413169991999)
+    local clickSound = Instance.new("Sound")
+    clickSound.SoundId = "rbxassetid://70413169991999"
+    clickSound.Volume = 1
+    clickSound.Parent = screenGui
+
+    local TweenService = game:GetService("TweenService")
+    local isClosing = false
+
+    closeButton.MouseButton1Click:Connect(function()
+        if isClosing then return end
+        isClosing = true
+
+        -- Play click sound
+        pcall(function()
+            clickSound:Play()
+        end)
+
+        -- Fade out animation configuration (0.4 seconds)
+        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        
+        local bgTween = TweenService:Create(darkFrame, tweenInfo, {BackgroundTransparency = 1})
+        local textTween = TweenService:Create(textLabel, tweenInfo, {TextTransparency = 1})
+        local btnBgTween = TweenService:Create(closeButton, tweenInfo, {BackgroundTransparency = 1})
+        local btnTextTween = TweenService:Create(closeButton, tweenInfo, {TextTransparency = 1})
+
+        bgTween:Play()
+        textTween:Play()
+        btnBgTween:Play()
+        btnTextTween:Play()
+
+        -- Destroy GUI completely after the fade animation finishes
+        task.delay(0.4, function()
+            screenGui:Destroy()
+        end)
+    end)
+    
+    -- Halt script execution completely so Fluent UI will not load
+    return
+end
+
+-- Safe Fluent UI Loader
+local Fluent = nil
+local success, err = pcall(function()
+    Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end)
+
+if not success or not Fluent then
+    Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Main.lua"))()
+end
+
+local Window = Fluent:CreateWindow({
+    Title = "AvoEZ Hub",
+    SubTitle = "Made by AvoEZ Devs",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 520),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Home = Window:AddTab({ Title = "Home", Icon = "" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Teleports = Window:AddTab({ Title = "Teleports", Icon = "" }),
+    Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
+    Credits = Window:AddTab({ Title = "Credits", Icon = "" }),
+}
+
+-- Select the first tab ("Home") upon execution
+Window:SelectTab(1)
+
+--------------------------------------------------
+-- SECTIONS & COMPONENTS (HOME TAB)
+--------------------------------------------------
+local HomeSection = Tabs.Home:AddSection("Idk")
+
+HomeSection:AddButton({
+    Title = "Copy Discord Link",
+    Description = "Join our Discord Server for more Scripts!",
+    Callback = function()
+        pcall(function()
+            if setclipboard then
+                setclipboard("https://discord.gg/zx5PawJ3m6")
+                Fluent:Notify({
+                    Title = "Success",
+                    Content = "Link copied to clipboard!",
+                    Duration = 3
+                })
+            end
+        end)
+    end
+})
+
+HomeSection:AddParagraph({
+    Title = "Others",
+    Content = "Thank you for using our Scripts! We appreciate it!"
+})
+
+--------------------------------------------------
+-- SECTIONS (MAIN TAB)
+--------------------------------------------------
+local Section1 = Tabs.Main:AddSection("Kill Player")
+local Section2 = Tabs.Main:AddSection("Remove Things")
+
+--------------------------------------------------
+-- SECTIONS & COMPONENTS (CREDITS TAB)
+--------------------------------------------------
+local CreditsSection = Tabs.Credits:AddSection("Information")
+CreditsSection:AddParagraph({
+    Title = "Script Information",
+    Content = "This Script was made by AvoEZ Devs This is was just Script and There lot of features but Yeah I don't know to explain btw"
+})
+
+--------------------------------------------------
+-- SECTIONS & COMPONENTS (TELEPORTS TAB)
+--------------------------------------------------
+local TeleportSection = Tabs.Teleports:AddSection("Location Teleports")
+
+local function teleportTo(cf)
+    local character = game:GetService("Players").LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+        character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+        character.HumanoidRootPart.CFrame = cf
+    end
+end
+
+TeleportSection:AddButton({
+    Title = "Get Golden Carpet",
+    Description = "Get Item Golden Carpet",
+    Callback = function()
+        teleportTo(CFrame.new(
+            100.108971, 13.5063791, 534.561951,
+            0.999934196, -0.000581467873, -0.0114580095,
+            0, 0.998714805, 0.0506720543,
+            0.0114580095, 0.0506687276, 0.998648822
+        ))
+    end
+})
+
+TeleportSection:AddButton({
+    Title = "Get Speed Coil",
+    Description = "Get Item Speed Coil",
+    Callback = function()
+        teleportTo(CFrame.new(
+            -27.8148308, -12.389761, 368.446991,
+            0.999436677, -0.0025206462, -0.0334665254,
+            0, 0.997175574, -0.0751167983,
+            0.0335613303, 0.0750744641, 0.996660113
+        ))
+    end
+})
+
+TeleportSection:AddButton({
+    Title = "Troll Area",
+    Description = "The Troll Area kinda many trollers (sometimes) but yeah its kinda fun i guess",
+    Callback = function()
+        teleportTo(CFrame.new(
+            112.306046, 5.99999952, 162.357956,
+            0.999907672, 1.50650816e-08, -0.0135903554,
+            -1.45514338e-08, 1, 3.78939085e-08,
+            0.0135903554, -3.76953457e-08, 0.999907672
+        ))
+    end
+})
+
+TeleportSection:AddButton({
+    Title = "Get Rainbow Carpet",
+    Description = "Get Item Rainbow Carpet",
+    Callback = function()
+        teleportTo(CFrame.new(
+            -0.232434213, 406.019012, -107.505188,
+            -0.999530256, 0.000570246601, -0.030642394,
+            0, 0.999826908, 0.0186055526,
+            0.0306477174, 0.0185968075, -0.999356627
+        ))
+    end
+})
+
+--------------------------------------------------
+-- SECTIONS & COMPONENTS (MISC TAB)
+--------------------------------------------------
+local MiscSection1 = Tabs.Misc:AddSection("Others")
+local MiscSection2 = Tabs.Misc:AddSection("Remove Things")
+
+local infJumpEnabled = false
+local lavaAutoTeleportEnabled = false
+local isResetting = false
+
+local Workspace = game:GetService("Workspace")
+
+-- Helper function to get spawn location position safely as a CFrame
+local function getSpawnPositionCFrame()
+    local spawnLocation = Workspace:FindFirstChild("SpawnLocation", true)
+    if spawnLocation and spawnLocation:IsA("BasePart") then
+        return spawnLocation.CFrame + Vector3.new(0, 3, 0)
+    end
+    return CFrame.new(0, 5, 0)
+end
+
+local UserInputService = game:GetService("UserInputService")
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled then
+        local character = game:GetService("Players").LocalPlayer.Character
+        if character and character:FindFirstChildOfClass("Humanoid") then
+            character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+MiscSection1:AddToggle("InfJumpToggle", {
+    Title = "Infinite Jump",
+    Default = false
+}):OnChanged(function(Value)
+    infJumpEnabled = Value
+end)
+
+-- 15 stud distance threshold from the part's outer bounds
+MiscSection1:AddToggle("LavaProximityToggle", {
+    Title = "Prevent from Touching Lava",
+    Default = false
+}):OnChanged(function(value)
+    lavaAutoTeleportEnabled = value
+    if lavaAutoTeleportEnabled then
+        task.spawn(function()
+            while lavaAutoTeleportEnabled do
+                local char = game:GetService("Players").LocalPlayer.Character
+                local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if rootPart and not isResetting then
+                    local shouldTeleport = false
+                    
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if obj:IsA("BasePart") and obj.Name:lower() == "lava" then
+                            local localPos = obj.CFrame:PointToObjectSpace(rootPart.Position)
+                            local halfSize = obj.Size / 2
+                            
+                            local clampedX = math.clamp(localPos.X, -halfSize.X, halfSize.X)
+                            local clampedY = math.clamp(localPos.Y, -halfSize.Y, halfSize.Y)
+                            local clampedZ = math.clamp(localPos.Z, -halfSize.Z, halfSize.Z)
+                            
+                            local closestPointLocal = Vector3.new(clampedX, clampedY, clampedZ)
+                            local closestPointWorld = obj.CFrame:PointToWorldSpace(closestPointLocal)
+                            
+                            local surfaceDistance = (rootPart.Position - closestPointWorld).Magnitude
+                            
+                            if surfaceDistance <= 15 then
+                                shouldTeleport = true
+                                break
+                            end
+                        end
+                    end
+                    
+                    if shouldTeleport then
+                        isResetting = true
+                        rootPart.AssemblyLinearVelocity = Vector3.zero
+                        rootPart.AssemblyAngularVelocity = Vector3.zero
+                        rootPart.CFrame = getSpawnPositionCFrame()
+                        task.wait(1.0)
+                        isResetting = false
+                    end
+                end
+                task.wait(0.05)
+            end
+        end)
+    end
+end)
+
+MiscSection2:AddButton({
+    Title = "Disable Gameplay Pause Notification",
+    Description = "This will remove your Pause Notification its kinda annoying tho but this for those people who hate it",
+    Callback = function()
+        pcall(function()
+            game:GetService("GuiService"):SetGameplayPausedNotificationEnabled(false)
+        end)
+    end
+})
+
+--------------------------------------------------
+-- VARIABLES & SERVICES
+--------------------------------------------------
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local ContextActionService = game:GetService("ContextActionService")
+
+local selectedPlayerName = nil
+local isRunning = false
+local throwIsVisible = false
+local selectedTrapMode = "Default (Lava)"
+local isCustomRoutineRunning = false
+
+-- Recursive deep search helper
+local function findDeepChild(parent, name)
+    local found = parent:FindFirstChild(name, true)
+    if found then return found end
+    for _, child in ipairs(parent:GetChildren()) do
+        local result = findDeepChild(child, name)
+        if result then return result end
+    end
+    return nil
+end
+
+-- Custom CFrame for Option 2
+local option2CFrame = CFrame.new(
+    -116.779045, -21.0000057, 22.2722797,
+    0.0266252607, 5.22794608e-08, -0.999645472,
+    -3.46233797e-08, 1, 5.13758174e-08,
+    0.999645472, 3.2842106e-08, 0.0266252607
+)
+
+local function getPlayerNames()
+    local list = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(list, player.Name)
+        end
+    end
+    return list
+end
+
+--------------------------------------------------
+-- UI COMPONENTS (SECTION 1)
+--------------------------------------------------
+local PlayerDropdown = Section1:AddDropdown("PlayerDropdown", {
+    Title = "Select Player",
+    Values = getPlayerNames(),
+    Multi = false,
+    Default = 1,
+})
+
+PlayerDropdown:OnChanged(function(Value)
+    selectedPlayerName = Value
+end)
+
+-- Auto refresh player list thread
+task.spawn(function()
+    while true do
+        task.wait(3)
+        local newPlayers = getPlayerNames()
+        PlayerDropdown:SetValues(newPlayers)
+        
+        if selectedPlayerName and not Players:FindFirstChild(selectedPlayerName) then
+            selectedPlayerName = nil
+        end
+    end
+end)
+
+local TrapDropdown = Section1:AddDropdown("TrapDropdown", {
+    Title = "Select Trap Mode",
+    Values = {"Default (Lava)", "Custom Position & ClickRegion"},
+    Multi = false,
+    Default = 1,
+})
+
+TrapDropdown:OnChanged(function(Value)
+    selectedTrapMode = Value
+end)
+
+local MainToggle = Section1:AddToggle("MainToggle", {
+    Title = "Loop Kill/Trap",
+    Default = false
+})
+
+MainToggle:OnChanged(function(Value)
+    isRunning = Value
+    isCustomRoutineRunning = false
+    if not Value then
+        UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+        pcall(function()
+            ContextActionService:UnbindAction("LockCursorHard")
+        end)
+    else
+        ContextActionService:BindAction("LockCursorHard", function(actionName, inputState, inputObject)
+            return Enum.ContextActionResult.Sink
+        end, false, Enum.UserInputType.MouseMovement, Enum.UserInputType.MouseWheel)
+    end
+end)
+
+-- Label / Paragraph under the toggle
+Section1:AddParagraph({
+    Title = "Notice!",
+    Content = "This can be glitched or something so we cant do anything else so please bear with us!",
+})
+
+--------------------------------------------------
+-- UI COMPONENTS (SECTION 2)
+--------------------------------------------------
+Section2:AddButton({
+    Title = "Destroy Barriers",
+    Description = "Remove Barriers But althrough it still doesn't get the items",
+    Callback = function()
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj.Name == "PartBarrier" then
+                obj:Destroy()
+            end
+        end
+    end
+})
+
+--------------------------------------------------
+-- FORCED BACKGROUND AUTO-CLICKER LOOP
+--------------------------------------------------
+task.spawn(function()
+    while true do
+        task.wait(0.05)
+        if isRunning and selectedPlayerName and not throwIsVisible and not isCustomRoutineRunning then
+            pcall(function()
+                local camera = Workspace.CurrentCamera
+                local viewportSize = camera and camera.ViewportSize or Vector2.new(1920, 1080)
+                local centerX, centerY = viewportSize.X / 2, viewportSize.Y / 2
+                
+                if mouse1click then
+                    mouse1click()
+                elseif mouse1press and mouse1release then
+                    mouse1press()
+                    task.wait(0.005)
+                    mouse1release()
+                end
+                
+                local VirtualInputManager = game:GetService("VirtualInputManager")
+                if VirtualInputManager then
+                    VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
+                    task.wait(0.005)
+                    VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
+                end
+            end)
+        end
+    end
+end)
+
+--------------------------------------------------
+-- CORE EXECUTION & TELEPORT LOOP
+--------------------------------------------------
+RunService.Heartbeat:Connect(function()
+    if not isRunning or isCustomRoutineRunning then return end
+    
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then 
+        return 
+    end
+    local hrp = character.HumanoidRootPart
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+
+    -- 1. Deep check for "Throw" visibility anywhere in PlayerGui
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    throwIsVisible = false
+    
+    if playerGui then
+        local throwObj = findDeepChild(playerGui, "Throw")
+        if throwObj and throwObj:IsA("GuiObject") then
+            throwIsVisible = throwObj.Visible
+        end
+    end
+
+    if throwIsVisible then
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+
+        if selectedTrapMode == "Default (Lava)" then
+            local lavaPart = findDeepChild(Workspace, "Lava")
+            if lavaPart and lavaPart:IsA("BasePart") then
+                hrp.CFrame = lavaPart.CFrame + Vector3.new(0, 3, 0)
+                if humanoid then
+                    pcall(function()
+                        humanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
+                        task.wait(0.02)
+                        humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
+                    end)
+                end
+            end
+        elseif selectedTrapMode == "Custom Position & ClickRegion" then
+            isCustomRoutineRunning = true
+            
+            -- Step 1: Teleport to custom position
+            hrp.CFrame = option2CFrame
+            
+            -- Step 2: Wait for 1 second
+            task.wait(1.0)
+            
+            -- Step 3: Click "ClickRegion" inside "Throw" frame
+            if playerGui then
+                local throwFrame = findDeepChild(playerGui, "Throw")
+                if throwFrame then
+                    local clickRegion = findDeepChild(throwFrame, "ClickRegion")
+                    if clickRegion and (clickRegion:IsA("TextButton") or clickRegion:IsA("ImageButton")) then
+                        pcall(function()
+                            for _, connection in ipairs(getconnections(clickRegion.MouseButton1Click)) do
+                                connection:Fire()
+                            end
+                            for _, connection in ipairs(getconnections(clickRegion.Activated)) do
+                                connection:Fire()
+                            end
+                        end)
+                    end
+                end
+            end
+            
+            -- Step 4: Wait for 0.5 seconds
+            task.wait(0.5)
+            
+            -- Step 5: Teleport back to spawn location
+            hrp.CFrame = getSpawnPositionCFrame()
+            
+            -- Step 6: Keep re-checking target until they are back in the "Ground" zone part
+            while isRunning do
+                task.wait(0.5)
+                local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+                if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHRP = targetPlayer.Character.HumanoidRootPart
+                    local groundPart = findDeepChild(Workspace, "Ground")
+                    
+                    if groundPart and groundPart:IsA("BasePart") then
+                        local distance = (targetHRP.Position - groundPart.Position).Magnitude
+                        if distance <= (groundPart.Size.Magnitude / 2) then
+                            break
+                        end
+                    else
+                        break
+                    end
+                else
+                    break
+                end
+            end
+            
+            isCustomRoutineRunning = false
+        end
+        return 
+    end
+
+    -- 2. Target following logic
+    if not selectedPlayerName then return end
+    local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+    if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then 
+        return 
+    end
+    local targetHRP = targetPlayer.Character.HumanoidRootPart
+
+    -- Lock directly behind target player
+    hrp.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 0.5)
+end)
+
+Fluent:Notify({
+    Title = "AvoEZ Hub",
+    Content = "Thank you for Loading our Scripts!",
+    Duration = 5
+})
