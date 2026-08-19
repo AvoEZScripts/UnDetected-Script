@@ -520,7 +520,7 @@ RunService.Heartbeat:Connect(function()
         hrp.AssemblyLinearVelocity = Vector3.zero
         hrp.AssemblyAngularVelocity = Vector3.zero
 
-        if selectedTrapMode == "Default (Lava)" then
+        if selectedTrapMode == "Lava" then
             local lavaPart = findDeepChild(Workspace, "Lava")
             if lavaPart and lavaPart:IsA("BasePart") then
                 hrp.CFrame = lavaPart.CFrame + Vector3.new(0, 3, 0)
@@ -532,7 +532,7 @@ RunService.Heartbeat:Connect(function()
                     end)
                 end
             end
-        elseif selectedTrapMode == "Custom Position & ClickRegion" then
+        elseif selectedTrapMode == "Barrier Trap" then
             isCustomRoutineRunning = true
             
             -- Step 1: Teleport to custom position
