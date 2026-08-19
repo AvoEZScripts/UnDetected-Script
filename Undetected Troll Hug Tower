@@ -348,7 +348,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local selectedPlayerName = nil
 local isRunning = false
 local throwIsVisible = false
-local selectedTrapMode = "Default (Lava)"
+local selectedTrapMode = "Lava"
 local isCustomRoutineRunning = false
 
 -- Recursive deep search helper
