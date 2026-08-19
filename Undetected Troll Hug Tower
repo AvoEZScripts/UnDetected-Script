@@ -175,7 +175,7 @@ CreditsSection:AddParagraph({
 --------------------------------------------------
 -- SECTIONS & COMPONENTS (TELEPORTS TAB)
 --------------------------------------------------
-local TeleportSection = Tabs.Teleports:AddSection("Location Teleports")
+local TeleportSection = Tabs.Teleports:AddSection("Teleports")
 
 local function teleportTo(cf)
     local character = game:GetService("Players").LocalPlayer.Character
@@ -409,7 +409,7 @@ end)
 
 local TrapDropdown = Section1:AddDropdown("TrapDropdown", {
     Title = "Select Trap Mode",
-    Values = {"Default (Lava)", "Custom Position & ClickRegion"},
+    Values = {"Lava", "Barrier Trap"},
     Multi = false,
     Default = 1,
 })
